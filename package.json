@@ -8,13 +8,18 @@
     "build": "parcel build index.html"
   },
   "dependencies": {
+    "@reach/router": "^1.2.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "rxjs": "^6.5.2"
+    "react-loading": "^2.0.3",
+    "rxjs": "^6.5.2",
+    "styled-components": "^4.3.2"
   },
   "devDependencies": {
+    "@types/reach__router": "^1.2.4",
     "@types/react": "^16.9.1",
     "@types/react-dom": "^16.8.5",
+    "@types/styled-components": "^4.1.18",
     "parcel-bundler": "^1.12.3",
     "typescript": "^3.5.3"
   }
