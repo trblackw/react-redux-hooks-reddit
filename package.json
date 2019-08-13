@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@reach/router": "^1.2.1",
+    "@types/marked": "^0.6.5",
+    "marked": "^0.7.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-loading": "^2.0.3",
