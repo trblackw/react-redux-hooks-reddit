@@ -1,11 +1,13 @@
-import React from 'react'
+import React from 'react';
+import { Router } from '@reach/router';
+import Post from './components/Post';
+import Posts from './components/Posts';
 
-const App = () => {
-   return (
-      <div>
-         App set up
-      </div>
-   )
-}
+const App = () => (
+   <Router>
+      <Posts path='/' />
+      <Post path='/:id' />
+   </Router>
+);
 
-export default App
+export default App;
