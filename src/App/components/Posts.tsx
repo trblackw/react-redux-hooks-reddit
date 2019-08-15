@@ -1,63 +1,109 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SubReddit } from '../types';
-import { useSharedState } from '../Api';
-import { BehaviorSubject } from 'rxjs';
 import styled from 'styled-components';
 import SubRedditSelection from './SubRedditSelection';
 import PostTitle from './PostTitle';
 import Loading from './Loading';
+import { ViewContainer } from './SharedStyledComponents';
 import { RouteComponentProps } from '@reach/router';
+import { useSelector, useDispatch } from 'react-redux';
+import { FETCH_POSTS } from '../../constants';
 
-export const RedditStateSubject = new BehaviorSubject({
-   isFetching: false,
-   posts: [],
-   selectedPost: {},
-   lastUpdated: new Date()
-});
+const options = [
+   SubReddit.ReactJS,
+   SubReddit.Angular,
+   SubReddit.WebDev,
+   SubReddit.LearnJS,
+   SubReddit.Node,
+   SubReddit.ProgrammerHumor,
+   SubReddit.SoftwareGore,
+   SubReddit.TypeScript,
+   SubReddit.WebDesign
+];
 
 const Posts: React.FC<RouteComponentProps> = (): JSX.Element => {
-   const options = [
-      SubReddit.ReactJS,
-      SubReddit.Angular,
-      SubReddit.WebDev,
-      SubReddit.LearnJS,
-      SubReddit.Node,
-      SubReddit.ProgrammerHumor,
-      SubReddit.SoftwareGore,
-      SubReddit.TypeScript,
-      SubReddit.WebDesign
-   ];
-   const [{ isFetching, posts }] = useSharedState(RedditStateSubject);
-   const isLoading = isFetching && posts.length === 0;
-   const isEmpty = !isFetching && posts.length === 0;
+   const posts = useSelector(({ posts }: any) => posts);
+   const dispatch = useDispatch();
+   const [loading, setLoading] = useState<boolean>(false);
+   const selectedSubReddit = useSelector(({ selectedSubReddit }: { selectedSubReddit: SubReddit }) => selectedSubReddit);
+
+   const fetchPosts = async () => {
+      setLoading(true);
+      const res = await fetch(`https://www.reddit.com/r/${selectedSubReddit}/top.json?limit=50`);
+      const { data: { children: posts } } = await res.json();
+      dispatch({ type: FETCH_POSTS, payload: posts.map(({ data }: any) => data) });
+      setLoading(false);
+   };
+
+   useEffect(() => {
+      fetchPosts();
+   }, [selectedSubReddit]);
+
    return (
-      <Container>
+      <ViewContainer>
          <SubRedditSelection options={options} />
-         {isLoading && <Loading />}
-         {isEmpty && <h2>No posts to show!</h2>}
-         <PostList>
-            {posts.map((post: any, i: number) => (
-               <li key={i}>
-                  <PostTitle title={post.title} id={post.id} />
-               </li>
-            ))}
-         </PostList>
-      </Container>
+         {loading ? (
+            <Loading />
+         ) : (
+            <PostList>
+               {posts.map((post: any, i: number) => (
+                  <li key={i}>
+                     <PostTitle title={post.title} id={post.id} />
+                     <SubContentContainer>
+                        <PostAuthor>{post.author}</PostAuthor>
+                        <Popularity>
+                           <img src='https://icon.now.sh/mode_comment/18/149EF0' alt='comment icon' /> {post.num_comments}
+                        </Popularity>
+                        <Popularity>
+                           <img src='https://icon.now.sh/arrow_upward/18/FF5700' alt='upvote icon' /> {post.ups}
+                        </Popularity>
+                     </SubContentContainer>
+                  </li>
+               ))}
+            </PostList>
+         )}
+      </ViewContainer>
    );
 };
 
-const Container = styled.div`
-   min-height: 100vh;
-   height: 100%;
-   box-sizing: border-box;
-   padding: 0 20px;
-`;
 const PostList = styled.ul`
    list-style: none;
    text-align: left;
    padding: 5px;
    margin: 0 auto;
    width: 100%;
+
+   li {
+      margin: 1em 0;
+      padding-bottom: 5px;
+   }
+
+   li:hover {
+      transform: translateX(15px);
+      transition-duration: 250ms;
+   }
 `;
 
+export const SubContentContainer = styled.div`
+   display: flex;
+   justify-content: flex-start;
+   flex-direction: row;
+`;
+
+export const PostAuthor = styled.span`
+   color: darkgray;
+   margin-left: 5px;
+`;
+
+export const Popularity = styled.div`
+   margin-left: 10px;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   flex-direction: row;
+
+   > * {
+      margin: 0 5px;
+   }
+`;
 export default Posts;
