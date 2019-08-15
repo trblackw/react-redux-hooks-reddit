@@ -8,7 +8,7 @@ import { ViewContainer } from './SharedStyledComponents';
 import { RouteComponentProps } from '@reach/router';
 import { useSelector, useDispatch } from 'react-redux';
 import { FETCH_POSTS } from '../../constants';
-
+import { Images } from '../types';
 const options = [
    SubReddit.ReactJS,
    SubReddit.Angular,
@@ -57,6 +57,7 @@ const Posts: React.FC<RouteComponentProps> = (): JSX.Element => {
                         <Popularity>
                            <img src='https://icon.now.sh/arrow_upward/18/FF5700' alt='upvote icon' /> {post.ups}
                         </Popularity>
+                        <BookmarkButton>Bookmark</BookmarkButton>
                      </SubContentContainer>
                   </li>
                ))}
@@ -76,11 +77,6 @@ const PostList = styled.ul`
    li {
       margin: 1em 0;
       padding-bottom: 5px;
-   }
-
-   li:hover {
-      transform: translateX(15px);
-      transition-duration: 250ms;
    }
 `;
 
@@ -106,4 +102,20 @@ export const Popularity = styled.div`
       margin: 0 5px;
    }
 `;
+
+const BookmarkButton = styled.button.attrs({ type: 'button'})`
+   background-color: #00D4BB;
+   border-radius: 4px;
+   padding: 4px 6px;
+   border: none;
+   margin-left: auto;
+   font-size: 0.9em;
+   font-weight: bold;
+   color: #eee;
+   &:hover {
+      transform: scale(1.1);
+      transition-duration: 250ms;
+      cursor: pointer;
+   }
+`
 export default Posts;
