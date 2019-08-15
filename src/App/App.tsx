@@ -22,7 +22,6 @@ const App = () => {
 };
 
 const AppContainer = styled.div`
-   max-width: 1100px;
    margin: 0 auto;
    background-color: ${({ theme }) => theme === Themes.light ? '#fff' : '#222'};
    transition: background-color 0.7s ease;
