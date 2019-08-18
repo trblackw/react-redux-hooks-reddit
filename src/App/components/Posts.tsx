@@ -9,8 +9,14 @@ import { RouteComponentProps } from '@reach/router';
 import { useSelector, useDispatch } from 'react-redux';
 import { FETCH_POSTS } from '../../constants';
 import { Images } from '../types';
+import useToggle from '../hooks/useToggle';
+import Modal from './Modal';
+import BookmarkForm from './BookmarkForm';
+
 const options = [
    SubReddit.ReactJS,
+   SubReddit.Popular,
+   SubReddit.Original,
    SubReddit.Angular,
    SubReddit.WebDev,
    SubReddit.LearnJS,
@@ -22,10 +28,11 @@ const options = [
 ];
 
 const Posts: React.FC<RouteComponentProps> = (): JSX.Element => {
-   const posts = useSelector(({ posts }: any) => posts);
-   const dispatch = useDispatch();
-   const [loading, setLoading] = useState<boolean>(false);
-   const selectedSubReddit = useSelector(({ selectedSubReddit }: { selectedSubReddit: SubReddit }) => selectedSubReddit);
+   const posts = useSelector(({ posts }: any) => posts),
+      dispatch = useDispatch(),
+      [loading, setLoading] = useState<boolean>(false),
+      selectedSubReddit = useSelector(({ selectedSubReddit }: { selectedSubReddit: SubReddit }) => selectedSubReddit),
+      [open, setOpen] = useToggle(false);
 
    const fetchPosts = async () => {
       setLoading(true);
@@ -35,9 +42,12 @@ const Posts: React.FC<RouteComponentProps> = (): JSX.Element => {
       setLoading(false);
    };
 
-   useEffect(() => {
-      fetchPosts();
-   }, [selectedSubReddit]);
+   useEffect(
+      () => {
+         fetchPosts();
+      },
+      [selectedSubReddit]
+   );
 
    return (
       <ViewContainer>
@@ -49,6 +59,11 @@ const Posts: React.FC<RouteComponentProps> = (): JSX.Element => {
                {posts.map((post: any, i: number) => (
                   <li key={i}>
                      <PostTitle title={post.title} id={post.id} />
+                     {open && (
+                        <Modal open={open} toggle={() => setOpen(!open)}>
+                           <BookmarkForm />
+                        </Modal>
+                     )}
                      <SubContentContainer>
                         <PostAuthor>{post.author}</PostAuthor>
                         <Popularity>
@@ -57,7 +72,7 @@ const Posts: React.FC<RouteComponentProps> = (): JSX.Element => {
                         <Popularity>
                            <img src='https://icon.now.sh/arrow_upward/18/FF5700' alt='upvote icon' /> {post.ups}
                         </Popularity>
-                        <BookmarkButton>Bookmark</BookmarkButton>
+                        <BookmarkButton onClick={() => setOpen(true)}>Bookmark</BookmarkButton>
                      </SubContentContainer>
                   </li>
                ))}
@@ -103,7 +118,7 @@ export const Popularity = styled.div`
    }
 `;
 
-const BookmarkButton = styled.button.attrs({ type: 'button'})`
+const BookmarkButton = styled.button.attrs({ type: 'button' })`
    background-color: #00D4BB;
    border-radius: 4px;
    padding: 4px 6px;
@@ -117,5 +132,5 @@ const BookmarkButton = styled.button.attrs({ type: 'button'})`
       transition-duration: 250ms;
       cursor: pointer;
    }
-`
+`;
 export default Posts;
