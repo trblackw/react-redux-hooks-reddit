@@ -9,7 +9,6 @@ import { formatTimeStamp } from '../utils';
 import Loading from './Loading';
 import { PostAuthor, SubContentContainer, Popularity } from './Posts';
 import { SubReddit } from '../types';
-
 interface Props extends RouteComponentProps {
    id?: string;
    title?: string;
@@ -17,7 +16,7 @@ interface Props extends RouteComponentProps {
 const Post: React.FC<Props> = ({ id }): JSX.Element => {
    const dispatch = useDispatch();
    const { post, comments } = useSelector(({ selectedPost }: any) => selectedPost);
-   const selectedSubReddit = useSelector(({ selectedSubReddit }: { selectedSubReddit: SubReddit }) => selectedSubReddit)
+   const selectedSubReddit = useSelector(({ selectedSubReddit }: { selectedSubReddit: SubReddit }) => selectedSubReddit);
    const [loading, setLoading] = useState<boolean>(false);
    useEffect(
       () => {
@@ -26,22 +25,14 @@ const Post: React.FC<Props> = ({ id }): JSX.Element => {
       [id]
    );
 
-   useEffect(
-      () => {
-         console.log('selectedSubReddit', selectedSubReddit);
-      },
-      [selectedSubReddit]
-   );
    const fetchSinglePost = async (id: string): Promise<void> => {
       try {
          setLoading(true);
          const res = await fetch(`https://www.reddit.com/comments/${id}/.json`);
          let [{ data: { children: post } }, { data: { children: comments } }] = await res.json();
          post = post[0].data;
-         // console.log('post', post);
-         // console.log('comments', comments);
          comments = comments.map(({ data }: any) => data);
-         dispatch({ type: FETCH_SINGLE_POST, payload: { post, comments } });
+         await dispatch({ type: FETCH_SINGLE_POST, payload: { post, comments } });
          setLoading(false);
       } catch (e) {
          console.error(e);
@@ -52,7 +43,7 @@ const Post: React.FC<Props> = ({ id }): JSX.Element => {
       <Loading />
    ) : (
       <ViewContainer>
-         <BackToPosts to="/">Back to {selectedSubReddit}</BackToPosts>
+         <BackToPosts to='/'>Back to {selectedSubReddit}</BackToPosts>
          <PostTitle>{post.title}</PostTitle>
          <TimeStamp>{formatTimeStamp(post.created)}</TimeStamp>
          {post.selftext && (
@@ -116,6 +107,6 @@ const BackToPosts = styled(Link)`
    text-decoration: none;
    color: #eee;
    padding: 5px 7px;
-   background-color: #FF4300;
+   background-color: #FF4500;
    border-radius: 4px;
-`
+`;
